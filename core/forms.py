@@ -24,15 +24,23 @@ class PatientRegistrationForm(forms.ModelForm):
     """
     class Meta:
         model = Patient
-        fields = ['phone', 'address', 'date_of_birth']
+        fields = ['phone_number', 'address', 'date_of_birth', 'blood_group']
         widgets = {
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: +33 6 12 34 56 78'
+            }),
             'address': forms.Textarea(attrs={'rows': 3}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'blood_group': forms.Select(attrs={
+                'class': 'form-control'
+            })
         }
         labels = {
-            'phone': 'Téléphone',
+            'phone_number': 'Téléphone',
             'address': 'Adresse',
             'date_of_birth': 'Date de naissance',
+            'blood_group': 'Groupe sanguin'
         }
 
 class AppointmentForm(forms.ModelForm):
@@ -117,3 +125,51 @@ class DoctorRegistrationForm(UserCreationForm):
 class CustomLoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mot de passe'}))
+
+class PatientProfileForm(forms.ModelForm):
+    class Meta:
+        model = Patient
+        fields = ['phone_number', 'address', 'date_of_birth', 'blood_group']
+        widgets = {
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: +33 6 12 34 56 78'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Votre adresse complète'
+            }),
+            'date_of_birth': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'blood_group': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
+        labels = {
+            'phone_number': 'Numéro de téléphone',
+            'address': 'Adresse',
+            'date_of_birth': 'Date de naissance',
+            'blood_group': 'Groupe sanguin'
+        }
+        help_texts = {
+            'phone_number': 'Format international recommandé',
+            'blood_group': 'Sélectionnez votre groupe sanguin si vous le connaissez'
+        }
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'first_name': 'Prénom',
+            'last_name': 'Nom',
+            'email': 'Adresse email'
+        }
