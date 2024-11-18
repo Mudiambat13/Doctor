@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil Médecin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <img src="{{ doctor.user.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                     class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                <h4>Dr. {{ doctor.user.get_full_name }}</h4>
+                <p class="text-muted">{{ doctor.speciality }}</p>
+                <p><strong>License:</strong> {{ doctor.license_number }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations professionnelles</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Contact</h6>
+                    <p><i class="fas fa-phone"></i> {{ doctor.phone }}</p>
+                    <p><i class="fas fa-envelope"></i> {{ doctor.user.email }}</p>
+                </div>
+                <div class="mb-3">
+                    <h6>Horaires de consultation</h6>
+                    <!-- Ajoutez ici les horaires -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

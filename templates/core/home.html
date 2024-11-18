@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center bg-light p-5 rounded">
+    <h1 class="display-4">Bienvenue sur Doctor App</h1>
+    <p class="lead">Prenez rendez-vous avec nos médecins en quelques clics</p>
+    {% if not user.is_authenticated %}
+    <div class="mt-4">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg mx-2">Connexion</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg mx-2">Inscription</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-user-md fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Médecins qualifiés</h5>
+                <p class="card-text">Consultez nos médecins spécialistes expérimentés.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-alt fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Rendez-vous en ligne</h5>
+                <p class="card-text">Prenez rendez-vous facilement en quelques clics.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Disponibilité 24/7</h5>
+                <p class="card-text">Accédez à votre espace patient à tout moment.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
