@@ -44,17 +44,17 @@ cryptography==42.0.2
 #1. Clonez ce dépôt sur votre machine locale :
 
 ```git clone https://github.com/Mudiambat13/Doctor.git  
-cd Doctor
+cd Doctor```
 
 
 #2. Installez les dépendances nécessaires :
 
-```pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 
 #3. Démarrez le serveur de développement :
 
-```python manage.py runserver
+```python manage.py runserver```
 
 
 #4. Accédez au projet dans votre navigateur à l'adresse : http://127.0.0.1:8000
@@ -79,7 +79,7 @@ Les contributions sont les bienvenues ! Si vous souhaitez participer :
 
 2. Créez une branche pour vos modifications :
 
-```git checkout -b feature/nom-de-la-fonctionnalité
+```git checkout -b feature/nom-de-la-fonctionnalité ```
 
 
 #3. Faites un pull request pour proposer vos changements.
