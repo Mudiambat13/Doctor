@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Mes rendez-vous</h1>
+    
+    <div class="row">
+        {% if appointments %}
+            {% for appointment in appointments %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {% if user.doctor %}
+                                Patient: {{ appointment.patient.get_full_name }}
+                            {% else %}
+                                Dr. {{ appointment.doctor.user.get_full_name }}
+                            {% endif %}
+                        </h5>
+                        <p class="card-text">
+                            Date: {{ appointment.date }}<br>
+                            Heure: {{ appointment.time }}<br>
+                            Statut: {{ appointment.get_status_display }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col">
+                <p>Aucun rendez-vous trouvé.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

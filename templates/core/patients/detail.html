@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil Patient{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <img src="{{ patient.user.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                     class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                <h4>{{ patient.user.get_full_name }}</h4>
+                <p class="text-muted">Patient ID: {{ patient.id }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informations personnelles</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">Nom complet</p>
+                    </div>
+                    <div class="col-sm-9">
+                        <p class="text-muted mb-0">{{ patient.user.get_full_name }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">Email</p>
+                    </div>
+                    <div class="col-sm-9">
+                        <p class="text-muted mb-0">{{ patient.user.email }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">Téléphone</p>
+                    </div>
+                    <div class="col-sm-9">
+                        <p class="text-muted mb-0">{{ patient.phone }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="mb-0">Adresse</p>
+                    </div>
+                    <div class="col-sm-9">
+                        <p class="text-muted mb-0">{{ patient.address }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Historique des rendez-vous</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Médecin</th>
+                                <th>Motif</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in patient.appointment_set.all %}
+                            <tr>
+                                <td>{{ appointment.date|date:"d/m/Y H:i" }}</td>
+                                <td>{{ appointment.doctor }}</td>
+                                <td>{{ appointment.reason }}</td>
+                                <td>
+                                    <span class="badge {% if appointment.status == 'CONFIRMED' %}bg-success{% elif appointment.status == 'PENDING' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ appointment.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Aucun rendez-vous trouvé</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

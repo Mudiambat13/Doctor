@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -33,11 +34,15 @@ class Appointment(models.Model):
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    date = models.DateTimeField()
+    date = models.DateField()
+    time = models.TimeField(default=timezone.now)
     reason = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-date', '-time']
+
     def __str__(self):
-        return f"RDV: {self.patient} avec {self.doctor} le {self.date}"
+        return f"RDV: {self.patient} avec {self.doctor} le {self.date} à {self.time}"

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center">
+        <h1 class="display-1">400</h1>
+        <h2 class="mb-4">Mauvaise requête</h2>
+        <p class="lead mb-4">Désolé, votre requête n'a pas pu être traitée.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary">Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %} 

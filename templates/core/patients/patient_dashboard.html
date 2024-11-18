@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>Mon espace patient</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Actions rapides</h5>
+                    <a href="{% url 'appointment_create' %}" class="btn btn-primary">Nouveau rendez-vous</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mes rendez-vous</h5>
+                    {% if appointments %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Médecin</th>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td>Dr. {{ appointment.doctor.user.get_full_name }}</td>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>{{ appointment.get_status_display }}</td>
+                                        <td>
+                                            <a href="{% url 'appointment_detail' appointment.pk %}" class="btn btn-sm btn-primary">Voir</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>Aucun rendez-vous programmé.</p>
+                        <a href="{% url 'appointment_create' %}" class="btn btn-primary">Prendre un rendez-vous</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

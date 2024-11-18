@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>
+        {% if patient %}
+            Modifier le profil patient
+        {% else %}
+            Nouveau patient
+        {% endif %}
+    </h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <div class="form-group mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="alert alert-danger">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn btn-primary">
+                    {% if patient %}
+                        Enregistrer les modifications
+                    {% else %}
+                        Créer le profil
+                    {% endif %}
+                </button>
+                <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

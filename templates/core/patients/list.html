@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Patients{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3>Patients</h3>
+        <a href="{% url 'patient_create' %}" class="btn btn-primary">Nouveau Patient</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Date de naissance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.user.get_full_name }}</td>
+                        <td>{{ patient.user.email }}</td>
+                        <td>{{ patient.phone }}</td>
+                        <td>{{ patient.date_of_birth|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{% url 'patient_detail' patient.id %}" class="btn btn-sm btn-info">Voir</a>
+                            <a href="{% url 'patient_edit' patient.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">Aucun patient trouvé</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Détails du rendez-vous</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Patient:</strong> {{ appointment.patient.user.get_full_name }}</p>
+                    <p><strong>Médecin:</strong> Dr. {{ appointment.doctor.user.get_full_name }}</p>
+                    <p><strong>Date:</strong> {{ appointment.date }}</p>
+                    <p><strong>Heure:</strong> {{ appointment.time }}</p>
+                    <p><strong>Statut:</strong> {{ appointment.get_status_display }}</p>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                {% if appointment.status == 'PENDING' %}
+                    <a href="{% url 'appointment_cancel' appointment.pk %}" class="btn btn-danger">Annuler</a>
+                {% endif %}
+                <a href="{% url 'appointment_list' %}" class="btn btn-secondary">Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
