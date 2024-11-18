@@ -215,3 +215,104 @@ def patient_edit(request, pk):
         'title': 'Modifier le profil'
     }
     return render(request, 'core/patient_edit.html', context)
+
+@login_required
+def profile(request):
+    """Vue pour afficher et modifier le profil de l'utilisateur"""
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        if hasattr(request.user, 'patient'):
+            profile_form = PatientProfileForm(request.POST, instance=request.user.patient)
+        else:
+            profile_form = None
+        
+        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+            user_form.save()
+            if profile_form:
+                profile_form.save()
+            messages.success(request, 'Votre profil a été mis à jour avec succès!')
+            return redirect('core:profile')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        if hasattr(request.user, 'patient'):
+            profile_form = PatientProfileForm(instance=request.user.patient)
+        else:
+            profile_form = None
+    
+    context = {
+        'title': 'Mon profil',
+        'user_form': user_form,
+        'profile_form': profile_form
+    }
+    
+    if hasattr(request.user, 'doctor'):
+        template_name = 'core/doctor_profile.html'
+        # Ajouter des informations spécifiques au médecin
+        context.update({
+            'appointments_count': Appointment.objects.filter(doctor=request.user.doctor).count(),
+            'pending_appointments': Appointment.objects.filter(doctor=request.user.doctor, status='PENDING').count()
+        })
+    else:
+        template_name = 'core/patient_profile.html'
+        # Ajouter des informations spécifiques au patient
+        context.update({
+            'appointments_count': Appointment.objects.filter(patient=request.user.patient).count(),
+            'next_appointment': Appointment.objects.filter(
+                patient=request.user.patient,
+                date__gte=timezone.now().date(),
+                status='CONFIRMED'
+            ).first()
+        })
+    
+    return render(request, template_name, context)
+
+@login_required
+def doctor_list(request):
+    """Vue pour afficher la liste des médecins"""
+    doctors = Doctor.objects.all()
+    return render(request, 'core/doctor_list.html', {
+        'doctors': doctors,
+        'title': 'Nos médecins'
+    })
+
+@login_required
+def doctor_detail(request, pk):
+    """Vue pour afficher le détail d'un médecin"""
+    doctor = get_object_or_404(Doctor, pk=pk)
+    appointments = Appointment.objects.filter(doctor=doctor)
+    
+    context = {
+        'doctor': doctor,
+        'appointments': appointments,
+        'title': f'Dr. {doctor.user.get_full_name()}'
+    }
+    return render(request, 'core/doctor_detail.html', context)
+
+@login_required
+def appointment_confirm(request, pk):
+    """Vue pour confirmer un rendez-vous (réservée aux médecins)"""
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    # Vérifier que l'utilisateur est le médecin concerné
+    if not hasattr(request.user, 'doctor') or request.user.doctor != appointment.doctor:
+        messages.error(request, "Vous n'avez pas le droit de confirmer ce rendez-vous.")
+        return redirect('core:appointment_list')
+    
+    # Vérifier que le rendez-vous est en attente
+    if appointment.status != 'PENDING':
+        messages.error(request, "Ce rendez-vous ne peut pas être confirmé.")
+        return redirect('core:appointment_detail', pk=appointment.pk)
+    
+    if request.method == 'POST':
+        appointment.status = 'CONFIRMED'
+        appointment.save()
+        messages.success(request, 'Le rendez-vous a été confirmé avec succès!')
+        
+        # Vous pouvez ajouter ici l'envoi d'un email de confirmation au patient
+        
+        return redirect('core:appointment_detail', pk=appointment.pk)
+    
+    return render(request, 'core/appointment_confirm.html', {
+        'appointment': appointment,
+        'title': 'Confirmer le rendez-vous'
+    })
