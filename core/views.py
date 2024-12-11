@@ -5,6 +5,9 @@ from django.utils import timezone
 from .models import Appointment, Doctor, Patient
 from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm
 from django.contrib.auth.forms import UserChangeForm
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
+from django.contrib.auth.views import LoginView
 
 def home(request):
     return render(request, 'core/home.html', {
@@ -15,33 +18,25 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Créer un profil patient pour l'utilisateur
-            Patient.objects.create(user=user)
-            messages.success(request, 'Votre compte a été créé avec succès! Vous pouvez maintenant vous connecter.')
+            form.save()
             return redirect('login')
     else:
         form = UserRegistrationForm()
     return render(request, 'core/auth/register.html', {'form': form})
 
 @login_required
-def dashboard(request):
-    context = {
-        'title': 'Tableau de bord'
-    }
+def doctor_dashboard(request):
+    """
+    The function `doctor_dashboard` returns a rendered HTML template for a doctor's dashboard.
     
-    if hasattr(request.user, 'doctor'):
-        appointments = Appointment.objects.filter(doctor=request.user.doctor)
-        return render(request, 'core/doctor_dashboard.html', {
-            **context,
-            'appointments': appointments
-        })
-    else:
-        appointments = Appointment.objects.filter(patient=request.user.patient)
-        return render(request, 'core/patient_dashboard.html', {
-            **context,
-            'appointments': appointments
-        })
+    :param request: The `request` parameter in the `doctor_dashboard` function is typically an object
+    that contains information about the current HTTP request. It includes details such as the user
+    making the request, any data being sent with the request, and other metadata related to the request.
+    In this context, the function is likely
+    :return: The function `doctor_dashboard` is returning a rendered template called
+    'core/dashboard.html' in response to the `request`.
+    """
+    return render(request, 'core/dashboard.html')
 
 @login_required
 def appointment_list(request):

@@ -1,22 +1,77 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="hero bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="display-4">Bienvenue sur MediConnect</h1>
-                <p class="lead">Votre plateforme de gestion de rendez-vous médicaux en ligne</p>
-                <div class="mt-4">
+<div class="bg-indigo-600">
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="text-white">
+                <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+                    Bienvenue sur MediConnect
+                </h1>
+                <p class="mt-6 text-xl text-indigo-100 max-w-3xl">
+                    Votre plateforme de gestion de rendez-vous médicaux en ligne
+                </p>
+                <div class="mt-8 flex flex-wrap gap-4">
                     {% if not user.is_authenticated %}
-                        <a href="{% url 'login' %}" class="btn btn-light btn-lg me-3">Connexion</a>
-                        <a href="{% url 'core:register' %}" class="btn btn-outline-light btn-lg">Inscription</a>
+                        <a href="{% url 'login' %}" 
+                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition duration-150">
+                            Connexion
+                        </a>
+                        <a href="{% url 'core:register' %}" 
+                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-400 transition duration-150">
+                            Inscription
+                        </a>
                     {% else %}
-                        <a href="{% url 'core:dashboard' %}" class="btn btn-light btn-lg">
+                        <a href="{% url 'core:dashboard' %}" 
+                           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition duration-150">
                             Accéder à mon tableau de bord
                         </a>
                     {% endif %}
                 </div>
+            </div>
+            <!-- Optionnel : Ajout d'une illustration ou image -->
+            <div class="hidden md:block">
+                <img src="https://via.placeholder.com/600x400" alt="Illustration" class="w-full h-auto rounded-lg shadow-xl">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section des fonctionnalités -->
+<div class="bg-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Carte 1 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 mb-4">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Prise de rendez-vous rapide</h3>
+                <p class="mt-2 text-gray-500">Réservez vos consultations en quelques clics</p>
+            </div>
+
+            <!-- Carte 2 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 mb-4">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Gestion simplifiée</h3>
+                <p class="mt-2 text-gray-500">Suivez et gérez vos rendez-vous facilement</p>
+            </div>
+
+            <!-- Carte 3 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="text-indigo-600 mb-4">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Accès professionnel</h3>
+                <p class="mt-2 text-gray-500">Espace dédié pour les professionnels de santé</p>
             </div>
         </div>
     </div>

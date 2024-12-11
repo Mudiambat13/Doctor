@@ -1,0 +1,57 @@
+/* Styles pour les pages de connexion et d'inscription */
+.auth-container {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.auth-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.auth-card-header {
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+}
+
+.auth-card-body {
+    padding: 30px;
+}
+
+.auth-form-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.auth-btn {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.auth-btn:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.auth-footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+} 

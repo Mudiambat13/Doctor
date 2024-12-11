@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Patient, Doctor, Appointment
+from .models import Patient, Doctor, Appointment, Consultation
 
 class UserRegistrationForm(UserCreationForm):
     """
@@ -157,6 +157,27 @@ class PatientProfileForm(forms.ModelForm):
         help_texts = {
             'phone_number': 'Format international recommandé',
             'blood_group': 'Sélectionnez votre groupe sanguin si vous le connaissez'
+        }
+
+class ConsultationForm(forms.ModelForm):
+    class Meta:
+        model = Consultation
+        fields = ['patient', 'doctor', 'date', 'diagnostic', 'traitement', 'notes', 'prescription']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'diagnostic': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'traitement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'prescription': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        labels = {
+            'patient': 'Patient',
+            'doctor': 'Docteur',
+            'date': 'Date de consultation',
+            'diagnostic': 'Diagnostic',
+            'traitement': 'Traitement',
+            'notes': 'Notes de consultation',
+            'prescription': 'Prescription',
         }
 
 class UserUpdateForm(forms.ModelForm):

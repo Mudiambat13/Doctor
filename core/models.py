@@ -46,6 +46,23 @@ class Doctor(models.Model):
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
 
+class Consultation(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, verbose_name='Patient')
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, verbose_name='Docteur')
+    date = models.DateField(default=timezone.now, verbose_name='Date de consultation')
+    diagnostic = models.TextField(blank=True, verbose_name='Diagnostic')
+    traitement = models.TextField(blank=True, verbose_name='Traitement')
+    notes = models.TextField(blank=True, verbose_name='Notes de consultation')
+    prescription = models.TextField(blank=True, verbose_name='Prescription')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Consultation de {self.patient} avec {self.doctor} le {self.date}"
+
+    class Meta:
+        ordering = ['-date']
+
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'En attente'),
