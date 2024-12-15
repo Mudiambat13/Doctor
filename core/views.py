@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import Appointment, Doctor, Patient
-from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm, UserUpdateForm, DoctorProfileForm
+from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm
 from django.contrib.auth.forms import UserChangeForm
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
@@ -102,43 +102,19 @@ def appointment_list(request):
 
 @login_required
 def appointment_create(request):
-    if hasattr(request.user, 'doctor'):
-        messages.error(request, 'Seuls les patients peuvent prendre rendez-vous.')
-        return redirect('dashboard')
+    if not hasattr(request.user, 'patient'):
+        messages.error(request, "Accès réservé aux patients.")
+        return redirect('core:home')
     
     if request.method == 'POST':
-        form = AppointmentForm(request.POST)
-        if form.is_valid():
-            appointment = form.save(commit=False)
-            appointment.patient = request.user.patient
-            appointment.status = 'PENDING'
-            appointment.save()
-            messages.success(request, 'Votre rendez-vous a été créé avec succès!')
-            return redirect('appointment_list')
-    else:
-        form = AppointmentForm()
-    
-    context = {
-        'form': form,
-        'title': 'Nouveau rendez-vous',
-        'doctors': Doctor.objects.all()
-    }
-    return render(request, 'core/appointment_form.html', context)
+        # Logique de traitement du formulaire
+        pass
+    return render(request, 'core/patients/appointment_form.html')
 
 @login_required
 def appointment_detail(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
-    
-    # Vérifier que l'utilisateur a le droit de voir ce rendez-vous
-    if not (hasattr(request.user, 'doctor') and request.user.doctor == appointment.doctor) and \
-       not (hasattr(request.user, 'patient') and request.user.patient == appointment.patient):
-        messages.error(request, "Vous n'avez pas accès à ce rendez-vous.")
-        return redirect('dashboard')
-    
-    return render(request, 'core/appointment_detail.html', {
-        'appointment': appointment,
-        'title': f'Rendez-vous du {appointment.date}'
-    })
+    # Logique d'affichage des détails du rendez-vous
+    return render(request, 'core/patients/appointment_detail.html')
 
 @login_required
 def appointment_edit(request, pk):
@@ -264,6 +240,7 @@ def patient_edit(request, pk):
 def profile(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
+        
         if hasattr(request.user, 'doctor'):
             profile_form = DoctorProfileForm(request.POST, instance=request.user.doctor)
         elif hasattr(request.user, 'patient'):
@@ -336,4 +313,22 @@ def appointment_confirm(request, pk):
     return render(request, 'core/appointment_confirm.html', {
         'appointment': appointment,
         'title': 'Confirmer le rendez-vous'
+    })
+
+@login_required
+def consultation_create(request):
+    if not hasattr(request.user, 'patient'):
+        messages.error(request, "Accès réservé aux patients.")
+        return redirect('core:home')
+    
+    if request.method == 'POST':
+        # Logique de traitement du formulaire
+        pass
+    return render(request, 'core/patients/consultation_form.html')
+
+@login_required
+def doctor_detail(request, pk):
+    doctor = get_object_or_404(Doctor, pk=pk)
+    return render(request, 'core/doctors/doctor_detail.html', {
+        'doctor': doctor
     })

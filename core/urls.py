@@ -38,4 +38,7 @@ urlpatterns = [
     path('appointments/<int:pk>/edit/', views.appointment_edit, name='appointment_edit'),
     path('appointments/<int:pk>/cancel/', views.appointment_cancel, name='appointment_cancel'),
     path('appointments/<int:pk>/confirm/', views.appointment_confirm, name='appointment_confirm'),
+    path('consultation/create/', views.consultation_create, name='consultation_form'),
+    path('appointment/create/', views.appointment_create, name='appointment_create'),
+    path('appointment/<int:pk>/', views.appointment_detail, name='appointment_detail'),
 ] 
