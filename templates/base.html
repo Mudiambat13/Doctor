@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Projet</title>
+    <title>MediConnect</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <link href="{% static 'css/output.min.css' %}" rel="stylesheet">
@@ -58,7 +58,7 @@
                            class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
                             Connexion
                         </a>
-                        <a href="{% url 'core:register' %}" 
+                        <a href="{% url 'login' %}" 
                            class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium">
                             Inscription
                         </a>
@@ -114,7 +114,7 @@
                            class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
                             Connexion
                         </a>
-                        <a href="{% url 'core:register' %}" 
+                        <a href="{% url 'login' %}" 
                            class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
                             Inscription
                         </a>

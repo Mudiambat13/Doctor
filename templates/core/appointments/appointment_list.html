@@ -1,91 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}Liste des Rendez-vous{% endblock %}
-
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Liste des Rendez-vous</h2>
+        <h1 class="text-2xl font-bold">Mes Rendez-vous</h1>
         <a href="{% url 'core:appointment_create' %}" 
-           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Nouveau Rendez-vous
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i> Nouveau rendez-vous
         </a>
     </div>
 
-    {% if appointments %}
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Heure
-                        </th>
-                        {% if user.patient %}
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Médecin
-                            </th>
-                        {% endif %}
-                        {% if user.doctor %}
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Patient
-                            </th>
-                        {% endif %}
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Raison
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for appointment in appointments %}
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {{ appointment.date|date:"d/m/Y" }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                {{ appointment.time|time:"H:i" }}
-                            </td>
-                            {% if user.patient %}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    Dr. {{ appointment.doctor.user.get_full_name }}
-                                </td>
-                            {% endif %}
-                            {% if user.doctor %}
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ appointment.patient.user.get_full_name }}
-                                </td>
-                            {% endif %}
-                            <td class="px-6 py-4">
-                                {{ appointment.reason }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{% url 'core:appointment_detail' appointment.pk %}" 
-                                   class="text-blue-600 hover:text-blue-900 mr-3">
-                                    Voir
-                                </a>
-                                <a href="{% url 'core:appointment_update' appointment.pk %}" 
-                                   class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                    Modifier
-                                </a>
-                                <a href="{% url 'core:appointment_delete' appointment.pk %}" 
-                                   class="text-red-600 hover:text-red-900">
-                                    Supprimer
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        {% if appointments %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    {% if user.patient %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
+                    {% else %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                    {% endif %}
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motif</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for appointment in appointments %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ appointment.date|date:"d/m/Y H:i" }}
+                    </td>
+                    {% if user.patient %}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        Dr. {{ appointment.doctor.user.get_full_name }}
+                    </td>
+                    {% else %}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ appointment.patient.user.get_full_name }}
+                    </td>
+                    {% endif %}
+                    <td class="px-6 py-4">
+                        {{ appointment.reason|truncatechars:50 }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if appointment.status == 'CONFIRMED' %}bg-green-100 text-green-800
+                            {% elif appointment.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
+                        <a href="#" class="text-red-600 hover:text-red-900">Annuler</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-gray-500">Aucun rendez-vous pour le moment.</p>
+            <a href="{% url 'core:appointment_create' %}" 
+               class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Prendre un rendez-vous
+            </a>
         </div>
-    {% else %}
-        <div class="bg-white shadow sm:rounded-lg p-6 text-center">
-            <p class="text-gray-500">Aucun rendez-vous trouvé.</p>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 {% endblock %} 

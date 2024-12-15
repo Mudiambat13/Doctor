@@ -2,52 +2,34 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <!-- En-tête -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-            <h1 class="text-2xl font-bold text-white">Liste des Médecins</h1>
-        </div>
-
-        <!-- Liste des médecins -->
-        <div class="p-6">
-            {% if doctors %}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for doctor in doctors %}
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden border">
-                            <div class="p-6">
-                                <div class="flex items-center mb-4">
-                                    <img src="{{ doctor.user.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
-                                         alt="Photo de profil" 
-                                         class="w-16 h-16 rounded-full object-cover mr-4">
-                                    <div>
-                                        <h3 class="text-lg font-semibold">
-                                            <a href="{% url 'core:doctor_detail' doctor.pk %}" 
-                                               class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out">
-                                                Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}
-                                            </a>
-                                        </h3>
-                                        <p class="text-gray-600">{{ doctor.speciality }}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-4">
-                                    {% if user.patient %}
-                                        <a href="{% url 'core:appointment_create' %}?doctor={{ doctor.pk }}" 
-                                           class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                            Prendre RDV
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+    <h1 class="text-2xl font-bold mb-6">Nos Médecins</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for doctor in doctors %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-user-md text-3xl text-blue-600"></i>
                 </div>
-            {% else %}
-                <div class="text-center py-8">
-                    <p class="text-gray-500">Aucun médecin disponible pour le moment.</p>
+                <div class="ml-4">
+                    <h2 class="text-xl font-semibold">Dr. {{ doctor.user.get_full_name }}</h2>
+                    <p class="text-gray-600">{{ doctor.speciality }}</p>
                 </div>
-            {% endif %}
+            </div>
+            <div class="border-t pt-4">
+                <p class="text-gray-600"><i class="fas fa-phone-alt mr-2"></i>{{ doctor.phone }}</p>
+                <p class="text-gray-600"><i class="fas fa-id-card mr-2"></i>Licence: {{ doctor.license_number }}</p>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'core:appointment_create' %}?doctor={{ doctor.id }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    Prendre rendez-vous
+                </a>
+            </div>
         </div>
+        {% empty %}
+        <p class="text-gray-600">Aucun médecin disponible pour le moment.</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %} 
