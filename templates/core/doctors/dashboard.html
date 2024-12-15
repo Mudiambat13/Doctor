@@ -3,8 +3,130 @@
 {% block title %}Tableau de bord Médecin{% endblock %}
 
 {% block content %}
-<div class="container mx-auto">
-    <h2 class="text-2xl font-bold">Tableau de bord Médecin</h2>
-    <!-- Contenu spécifique au médecin -->
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 bg-white shadow-lg">
+        <div class="p-4">
+            <h2 class="text-lg font-bold">Menu</h2>
+            <ul class="mt-4 space-y-2">
+                <li><a href="{% url 'core:doctor_dashboard' %}" class="text-gray-600 hover:text-blue-600">Tableau de bord</a></li>
+                <li><a href="{% url 'core:appointment_list' %}" class="text-gray-600 hover:text-blue-600">Rendez-vous</a></li>
+                <li><a href="{% url 'core:consultation_list' %}" class="text-gray-600 hover:text-blue-600">Consultations</a></li>
+                <li><a href="{% url 'core:profile' %}" class="text-gray-600 hover:text-blue-600">Profil</a></li>
+                <li><a href="{% url 'logout' %}" class="text-gray-600 hover:text-blue-600">Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="flex-1 overflow-auto">
+        <!-- En-tête -->
+        <div class="bg-white shadow-sm p-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">Tableau de bord Médecin</h1>
+            <span class="text-gray-600">Dr. {{ user.first_name }} {{ user.last_name }}</span>
+        </div>
+
+        <!-- Cartes statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+            <!-- Carte 1 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Prochains rendez-vous</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ appointments.count }}</p>
+            </div>
+
+            <!-- Carte 2 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Consultations</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ consultations.count }}</p>
+            </div>
+
+            <!-- Carte 3 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Patients</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ patients_count }}</p>
+            </div>
+        </div>
+
+        <!-- Liste des rendez-vous récents -->
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-4">Rendez-vous récents</h2>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for appointment in recent_appointments %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ appointment.patient.user.get_full_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ appointment.date|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ appointment.time|time:"H:i" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if appointment.status == 'CONFIRMED' %}bg-green-100 text-green-800
+                                    {% elif appointment.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ appointment.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{% url 'core:appointment_detail' appointment.pk %}" 
+                                   class="text-blue-600 hover:text-blue-900">Voir</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                Aucun rendez-vous récent
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Liste des consultations récentes -->
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-4">Consultations récentes</h2>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Diagnostic</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for consultation in recent_consultations %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ consultation.patient.user.get_full_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ consultation.date|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4">{{ consultation.diagnosis|truncatechars:50 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{% url 'core:consultation_detail' consultation.pk %}" 
+                                   class="text-blue-600 hover:text-blue-900">Voir</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                Aucune consultation récente
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

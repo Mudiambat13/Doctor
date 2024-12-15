@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import Patient, Doctor, Appointment, Consultation
+from django.utils import timezone
 
 class UserRegistrationForm(UserCreationForm):
     """
@@ -51,15 +52,37 @@ class AppointmentForm(forms.ModelForm):
     """
     class Meta:
         model = Appointment
-        fields = ['doctor', 'date', 'time', 'reason']
+        fields = ['doctor', 'date', 'reason']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'})
+            'doctor': forms.Select(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                }
+            ),
+            'date': forms.DateTimeInput(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'type': 'datetime-local',
+                    'min': timezone.now().strftime('%Y-%m-%dT%H:%M')
+                }
+            ),
+            'reason': forms.Textarea(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'rows': 4,
+                    'placeholder': 'Décrivez brièvement le motif de votre consultation'
+                }
+            )
+        }
+        labels = {
+            'doctor': 'Médecin',
+            'date': 'Date et heure du rendez-vous',
+            'reason': 'Motif de la consultation'
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Ne montre que les médecins actifs
+        # Filtrer uniquement les médecins actifs
         self.fields['doctor'].queryset = Doctor.objects.filter(user__is_active=True)
 
 class PatientSearchForm(forms.Form):
@@ -164,21 +187,80 @@ class ConsultationForm(forms.ModelForm):
         model = Consultation
         fields = ['patient', 'doctor', 'date', 'diagnostic', 'traitement', 'notes', 'prescription']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'diagnostic': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'traitement': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'prescription': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'patient': forms.Select(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                }
+            ),
+            'doctor': forms.Select(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                }
+            ),
+            'date': forms.DateInput(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'type': 'date',
+                }
+            ),
+            'diagnostic': forms.Textarea(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'rows': 4,
+                    'placeholder': 'Entrez le diagnostic'
+                }
+            ),
+            'traitement': forms.Textarea(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'rows': 4,
+                    'placeholder': 'Décrivez le traitement prescrit'
+                }
+            ),
+            'notes': forms.Textarea(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'rows': 4,
+                    'placeholder': 'Notes additionnelles'
+                }
+            ),
+            'prescription': forms.Textarea(
+                attrs={
+                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
+                    'rows': 4,
+                    'placeholder': 'Détails de la prescription'
+                }
+            )
         }
         labels = {
             'patient': 'Patient',
-            'doctor': 'Docteur',
+            'doctor': 'Médecin',
             'date': 'Date de consultation',
             'diagnostic': 'Diagnostic',
             'traitement': 'Traitement',
-            'notes': 'Notes de consultation',
-            'prescription': 'Prescription',
+            'notes': 'Notes',
+            'prescription': 'Prescription'
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Si l'utilisateur est un médecin, pré-remplir et désactiver le champ doctor
+        if user and hasattr(user, 'doctor'):
+            self.fields['doctor'].initial = user.doctor
+            self.fields['doctor'].disabled = True
+            self.fields['doctor'].queryset = Doctor.objects.filter(id=user.doctor.id)
+        else:
+            self.fields['doctor'].queryset = Doctor.objects.filter(user__is_active=True)
+
+        # Si l'utilisateur est un patient, pré-remplir et désactiver le champ patient
+        if user and hasattr(user, 'patient'):
+            self.fields['patient'].initial = user.patient
+            self.fields['patient'].disabled = True
+            self.fields['patient'].queryset = Patient.objects.filter(id=user.patient.id)
+        else:
+            self.fields['patient'].queryset = Patient.objects.all()
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()

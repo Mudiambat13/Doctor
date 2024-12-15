@@ -1,75 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <!-- En-tête -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-            <h1 class="text-2xl font-bold text-white">Tableau de bord Patient</h1>
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar avec animation -->
+    <div class="sidebar w-64 bg-white shadow-lg">
+        <!-- Contenu du sidebar -->
+        <div class="p-4">
+            <h2 class="text-lg font-bold">Menu</h2>
+            <ul class="mt-4 space-y-2">
+                <li><a href="{% url 'core:dashboard' %}" class="text-gray-600 hover:text-blue-600">Tableau de bord</a></li>
+                <li><a href="{% url 'core:appointment_list' %}" class="text-gray-600 hover:text-blue-600">Rendez-vous</a></li>
+                <li><a href="{% url 'core:doctor_list' %}" class="text-gray-600 hover:text-blue-600">Consultations</a></li>
+                <li><a href="{% url 'core:profile' %}" class="text-gray-600 hover:text-blue-600">Profil</a></li>
+                <li><a href="{% url 'logout' %}" class="text-gray-600 hover:text-blue-600">Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="flex-1 overflow-auto">
+        <!-- En-tête avec animation -->
+        <div class="animate-on-scroll bg-white shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-blue-600">Tableau de bord</h1>
         </div>
 
-        <!-- Actions rapides -->
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Bouton Nouveau Rendez-vous -->
-                <a href="{% url 'core:appointment_create' %}" 
-                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-center transition duration-300 ease-in-out transform hover:scale-105">
-                    <i class="fas fa-calendar-plus text-2xl mb-2"></i>
-                    <h3 class="text-lg font-semibold">Prendre un rendez-vous</h3>
-                    <p class="text-sm opacity-80">Planifiez une consultation avec un médecin</p>
-                </a>
+        <!-- Cartes statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+            <!-- Carte 1 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Prochains rendez-vous</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">5</p>
+            </div>
 
-                <!-- Bouton Fiche de consultation -->
-                <a href="{% url 'core:consultation_form' %}" 
-                   class="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-center transition duration-300 ease-in-out transform hover:scale-105">
-                    <i class="fas fa-file-medical text-2xl mb-2"></i>
-                    <h3 class="text-lg font-semibold">Fiche de consultation</h3>
-                    <p class="text-sm opacity-80">Remplir une nouvelle fiche de consultation</p>
-                </a>
+            <!-- Carte 2 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Consultations</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">12</p>
+            </div>
+
+            <!-- Carte 3 -->
+            <div class="card bg-white p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h3 class="text-lg font-semibold">Messages</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">3</p>
             </div>
         </div>
 
-        <!-- Rendez-vous à venir -->
-        <div class="p-6 border-t">
-            <h2 class="text-xl font-semibold mb-4">Mes prochains rendez-vous</h2>
-            {% if appointments %}
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Médecin</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {% for appointment in appointments %}
-                            <tr>
-                                <td class="px-6 py-4">{{ appointment.date|date:"d/m/Y" }}</td>
-                                <td class="px-6 py-4">{{ appointment.time|time:"H:i" }}</td>
-                                <td class="px-6 py-4">Dr. {{ appointment.doctor.user.get_full_name }}</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-1 text-sm rounded-full 
-                                        {% if appointment.status == 'CONFIRMED' %}bg-green-100 text-green-800
-                                        {% elif appointment.status == 'PENDING' %}bg-yellow-100 text-yellow-800
-                                        {% else %}bg-red-100 text-red-800{% endif %}">
-                                        {{ appointment.get_status_display }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <a href="{% url 'core:appointment_detail' appointment.pk %}" 
-                                       class="text-blue-600 hover:text-blue-900">Voir</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p class="text-gray-500 text-center py-4">Aucun rendez-vous à venir</p>
-            {% endif %}
+        <!-- Boutons d'action -->
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button class="btn-hover bg-white p-4 rounded-lg shadow-md flex items-center justify-center space-x-2 hover:bg-blue-100 transition duration-200">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Nouveau rendez-vous</span>
+            </button>
+
+            <button class="btn-hover bg-white p-4 rounded-lg shadow-md flex items-center justify-center space-x-2 hover:bg-blue-100 transition duration-200">
+                <i class="fas fa-stethoscope"></i>
+                <span>Nouvelle consultation</span>
+            </button>
         </div>
     </div>
 </div>

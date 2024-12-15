@@ -1,82 +1,143 @@
 {% extends 'base.html' %}
 
-{% block title %}Mon Profil{% endblock %}
-
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-3xl mx-auto">
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- En-tête du profil -->
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-                <h2 class="text-2xl font-bold text-white">Mon Profil</h2>
-            </div>
-            
-            <!-- Messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="p-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <!-- Formulaire -->
-            <div class="p-6">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <!-- Informations générales -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-2 border-b">
-                            Informations générales
-                        </h3>
-                        {% for field in user_form %}
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">
-                                    {{ field.label }}
-                                </label>
-                                <div class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                    {{ field }}
-                                </div>
-                                {% if field.errors %}
-                                    <p class="text-red-500 text-xs italic">{{ field.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Informations spécifiques -->
-                    {% if profile_form %}
-                        <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-2 border-b">
-                                {% if user.doctor %}Informations Médecin{% else %}Informations Patient{% endif %}
-                            </h3>
-                            {% for field in profile_form %}
-                                <div class="mb-4">
-                                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                                        {{ field.label }}
-                                    </label>
-                                    <div class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                        {{ field }}
-                                    </div>
-                                    {% if field.errors %}
-                                        <p class="text-red-500 text-xs italic">{{ field.errors.0 }}</p>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
-                    <!-- Bouton de soumission -->
-                    <div class="flex justify-end">
-                        <button type="submit" 
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
-                            Mettre à jour
-                        </button>
-                    </div>
-                </form>
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-user-circle text-white text-5xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-white">{{ user.get_full_name }}</h1>
+                    <p class="text-blue-100">Patient</p>
+                </div>
             </div>
         </div>
+
+        <!-- Informations du profil -->
+        <div class="p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Informations personnelles -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations personnelles</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                            <input type="text" name="first_name" value="{{ user.first_name }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                            <input type="text" name="last_name" value="{{ user.last_name }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" name="email" value="{{ user.email }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                            <input type="tel" name="phone_number" value="{{ user.patient.phone_number }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations médicales -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations médicales</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date de naissance</label>
+                            <input type="date" name="date_of_birth" value="{{ user.patient.date_of_birth|date:'Y-m-d' }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                            <select name="gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                {% for value, label in form.fields.gender.choices %}
+                                    <option value="{{ value }}" {% if user.patient.gender == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taille (cm)</label>
+                            <input type="number" name="height" value="{{ user.patient.height }}" step="0.01"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Poids (kg)</label>
+                            <input type="number" name="weight" value="{{ user.patient.weight }}" step="0.01"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Groupe sanguin</label>
+                            <select name="blood_group" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                {% for value, label in form.fields.blood_group.choices %}
+                                    <option value="{{ value }}" {% if user.patient.blood_group == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Antécédents médicaux et allergies -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Antécédents & Allergies</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Allergies</label>
+                            <textarea name="allergies" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ user.patient.allergies }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Antécédents médicaux</label>
+                            <textarea name="medical_history" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ user.patient.medical_history }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adresse -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Adresse</h2>
+                    <div>
+                        <textarea name="address" rows="3"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ user.patient.address }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex justify-end space-x-4">
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <!-- Statistiques -->
+    {% if user.patient.height and user.patient.weight %}
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-medium text-gray-900">IMC</h3>
+            <p class="mt-2 text-3xl font-bold text-blue-600">{{ user.patient.bmi }}</p>
+            <p class="text-sm text-gray-500">Indice de masse corporelle</p>
+        </div>
+        {% if user.patient.date_of_birth %}
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-medium text-gray-900">Âge</h3>
+            <p class="mt-2 text-3xl font-bold text-blue-600">{{ user.patient.age }} ans</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %} 

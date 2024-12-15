@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- En-tête -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+            <h1 class="text-2xl font-bold text-white">Détails de la Consultation</h1>
+            <p class="text-white opacity-80 mt-2">Référence: {{ consultation.reference }}</p>
+        </div>
+
+        <!-- Contenu -->
+        <div class="p-6">
+            <!-- Informations générales -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4 pb-2 border-b">Informations générales</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-600">Date:</p>
+                        <p class="font-semibold">{{ consultation.date|date:"d/m/Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Médecin:</p>
+                        <p class="font-semibold">Dr. {{ consultation.doctor.user.get_full_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Patient:</p>
+                        <p class="font-semibold">{{ consultation.patient.user.get_full_name }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostic et Traitement -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4 pb-2 border-b">Diagnostic et Traitement</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-600 mb-2">Diagnostic:</p>
+                        <p class="bg-gray-50 p-4 rounded">{{ consultation.diagnostic|default:"Aucun diagnostic enregistré" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-2">Traitement:</p>
+                        <p class="bg-gray-50 p-4 rounded">{{ consultation.traitement|default:"Aucun traitement prescrit" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes et Prescription -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4 pb-2 border-b">Notes et Prescription</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-600 mb-2">Notes:</p>
+                        <p class="bg-gray-50 p-4 rounded">{{ consultation.notes|default:"Aucune note" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-2">Prescription:</p>
+                        <p class="bg-gray-50 p-4 rounded">{{ consultation.prescription|default:"Aucune prescription" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'core:consultation_list' %}" 
+                   class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

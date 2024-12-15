@@ -149,7 +149,7 @@ SIMPLE_JWT = {
 # Configuration de la redirection après login
 LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'core:home'
 
 # Configuration des emails (pour le développement)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

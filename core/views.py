@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .models import Appointment, Doctor, Patient
-from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm
+from .models import Appointment, Doctor, Patient, Consultation
+from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm,ConsultationForm, UserUpdateForm, DoctorProfileForm
 from django.contrib.auth.forms import UserChangeForm
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
@@ -68,9 +68,29 @@ def doctor_dashboard(request):
         messages.error(request, "Accès non autorisé. Vous n'êtes pas un médecin.")
         return redirect('core:home')
     
+    # Récupérer les rendez-vous récents
+    recent_appointments = Appointment.objects.filter(
+        doctor=request.user.doctor
+    ).order_by('-date', '-time')[:5]  # 5 derniers rendez-vous
+
+    # Récupérer les consultations récentes
+    recent_consultations = Consultation.objects.filter(
+        doctor=request.user.doctor
+    ).order_by('-date')[:5]  # 5 dernières consultations
+
+    # Compter le nombre total de patients uniques
+    patients_count = Patient.objects.filter(
+        appointment__doctor=request.user.doctor
+    ).distinct().count()
+
     context = {
         'user': request.user,
         'doctor': request.user.doctor,
+        'recent_appointments': recent_appointments,
+        'recent_consultations': recent_consultations,
+        'appointments': Appointment.objects.filter(doctor=request.user.doctor),
+        'consultations': Consultation.objects.filter(doctor=request.user.doctor),
+        'patients_count': patients_count,
     }
     return render(request, 'core/doctors/dashboard.html', context)
 
@@ -89,32 +109,31 @@ def patient_dashboard(request):
 
 @login_required
 def appointment_list(request):
-    if hasattr(request.user, 'doctor'):
-        appointments = Appointment.objects.filter(doctor=request.user.doctor)
-    else:
-        appointments = Appointment.objects.filter(patient=request.user.patient)
-    
-    context = {
-        'appointments': appointments,
-        'title': 'Mes rendez-vous'
-    }
-    return render(request, 'core/appointments/appointment_list.html', context)
+    # Logique pour récupérer et afficher les rendez-vous
+    return render(request, 'core/appointments/appointment_list.html', {})
 
 @login_required
 def appointment_create(request):
-    if not hasattr(request.user, 'patient'):
-        messages.error(request, "Accès réservé aux patients.")
-        return redirect('core:home')
-    
     if request.method == 'POST':
-        # Logique de traitement du formulaire
-        pass
-    return render(request, 'core/patients/appointment_form.html')
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.patient = request.user.patient
+            appointment.save()
+            messages.success(request, 'Votre rendez-vous a été créé avec succès!')
+            return redirect('core:appointment_list')
+    else:
+        form = AppointmentForm()
+    
+    return render(request, 'core/appointments/appointment_form.html', {
+        'form': form,
+        'title': 'Nouveau rendez-vous'
+    })
 
 @login_required
 def appointment_detail(request, pk):
     # Logique d'affichage des détails du rendez-vous
-    return render(request, 'core/patients/appointment_detail.html')
+    return render(request, 'core/appointments/appointment_detail.html')
 
 @login_required
 def appointment_edit(request, pk):
@@ -146,7 +165,7 @@ def appointment_edit(request, pk):
         'appointment': appointment,
         'is_edit': True
     }
-    return render(request, 'core/appointment_form.html', context)
+    return render(request, 'core/appointments/appointment_form.html', context)
 
 @login_required
 def appointment_cancel(request, pk):
@@ -183,7 +202,7 @@ def patient_list(request):
         return redirect('dashboard')
     
     patients = Patient.objects.all()
-    return render(request, 'core/patient_list.html', {
+    return render(request, 'core/patients/patient_list.html', {
         'patients': patients,
         'title': 'Liste des patients'
     })
@@ -268,7 +287,7 @@ def profile(request):
 def doctor_list(request):
     """Vue pour afficher la liste des médecins"""
     doctors = Doctor.objects.all()
-    return render(request, 'core/doctor_list.html', {
+    return render(request, 'core/doctors/doctor_list.html', {
         'doctors': doctors,
         'title': 'Nos médecins'
     })
@@ -284,7 +303,7 @@ def doctor_detail(request, pk):
         'appointments': appointments,
         'title': f'Dr. {doctor.user.get_full_name()}'
     }
-    return render(request, 'core/doctor_detail.html', context)
+    return render(request, 'core/doctors/doctor_detail.html', context)
 
 @login_required
 def appointment_confirm(request, pk):
@@ -310,25 +329,104 @@ def appointment_confirm(request, pk):
         
         return redirect('core:appointment_detail', pk=appointment.pk)
     
-    return render(request, 'core/appointment_confirm.html', {
+    return render(request, 'core/appointments/appointment_confirm.html', {
         'appointment': appointment,
         'title': 'Confirmer le rendez-vous'
     })
 
 @login_required
 def consultation_create(request):
-    if not hasattr(request.user, 'patient'):
-        messages.error(request, "Accès réservé aux patients.")
-        return redirect('core:home')
-    
     if request.method == 'POST':
-        # Logique de traitement du formulaire
-        pass
-    return render(request, 'core/patients/consultation_form.html')
+        form = ConsultationForm(request.POST, user=request.user)
+        if form.is_valid():
+            consultation = form.save(commit=False)
+            if hasattr(request.user, 'patient'):
+                consultation.patient = request.user.patient
+            if hasattr(request.user, 'doctor'):
+                consultation.doctor = request.user.doctor
+            consultation.save()
+            messages.success(request, 'La consultation a été créée avec succès.')
+            return redirect('core:consultation_list')
+    else:
+        form = ConsultationForm(user=request.user)
+    
+    return render(request, 'core/consultations/consultation_form.html', {
+        'form': form,
+        'title': 'Nouvelle Consultation'
+    })
 
 @login_required
-def doctor_detail(request, pk):
-    doctor = get_object_or_404(Doctor, pk=pk)
-    return render(request, 'core/doctors/doctor_detail.html', {
-        'doctor': doctor
+def consultation_detail(request, pk):
+    consultation = get_object_or_404(Consultation, pk=pk)
+    
+    # Vérification des permissions
+    if hasattr(request.user, 'patient') and request.user.patient == consultation.patient:
+        authorized = True
+    elif hasattr(request.user, 'doctor') and request.user.doctor == consultation.doctor:
+        authorized = True
+    else:
+        authorized = False
+
+    if not authorized:
+        messages.error(request, "Vous n'avez pas accès à cette consultation.")
+        return redirect('core:home')
+
+    return render(request, 'core/consultations/consultation_detail.html', {
+        'consultation': consultation
+    })
+
+@login_required
+def consultation_list(request):
+    if hasattr(request.user, 'patient'):
+        consultations = Consultation.objects.filter(patient=request.user.patient)
+    elif hasattr(request.user, 'doctor'):
+        consultations = Consultation.objects.filter(doctor=request.user.doctor)
+    else:
+        messages.error(request, "Accès non autorisé.")
+        return redirect('core:home')
+    
+    return render(request, 'core/consultations/consultation_list.html', {
+        'consultations': consultations
+    })
+
+@login_required
+def appointment_update(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    # Vérifier que l'utilisateur a le droit de modifier ce rendez-vous
+    if not (request.user.is_staff or appointment.patient.user == request.user):
+        messages.error(request, "Vous n'avez pas la permission de modifier ce rendez-vous.")
+        return redirect('core:appointment_list')
+
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST, instance=appointment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Le rendez-vous a été modifié avec succès.')
+            return redirect('core:appointment_list')
+    else:
+        form = AppointmentForm(instance=appointment)
+
+    return render(request, 'core/appointments/appointment_form.html', {
+        'form': form,
+        'appointment': appointment,
+        'title': 'Modifier le rendez-vous'
+    })
+
+@login_required
+def appointment_delete(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    # Vérifier que l'utilisateur a le droit de supprimer ce rendez-vous
+    if not (request.user.is_staff or appointment.patient.user == request.user):
+        messages.error(request, "Vous n'avez pas la permission de supprimer ce rendez-vous.")
+        return redirect('core:appointment_list')
+
+    if request.method == 'POST':
+        appointment.delete()
+        messages.success(request, 'Le rendez-vous a été supprimé avec succès.')
+        return redirect('core:appointment_list')
+
+    return render(request, 'core/appointments/appointment_confirm_delete.html', {
+        'appointment': appointment
     })

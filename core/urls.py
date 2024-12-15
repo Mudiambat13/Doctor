@@ -33,7 +33,9 @@ urlpatterns = [
     
     # Gestion des rendez-vous
     path('appointments/', views.appointment_list, name='appointment_list'),
-    path('appointments/create/', views.appointment_create, name='appointment_create'),
+    path('appointment/create/', views.appointment_create, name='appointment_create'),
+    path('appointment/<int:pk>/update/', views.appointment_update, name='appointment_update'),
+    path('appointment/<int:pk>/delete/', views.appointment_delete, name='appointment_delete'),
     path('appointments/<int:pk>/', views.appointment_detail, name='appointment_detail'),
     path('appointments/<int:pk>/edit/', views.appointment_edit, name='appointment_edit'),
     path('appointments/<int:pk>/cancel/', views.appointment_cancel, name='appointment_cancel'),
@@ -41,4 +43,7 @@ urlpatterns = [
     path('consultation/create/', views.consultation_create, name='consultation_form'),
     path('appointment/create/', views.appointment_create, name='appointment_create'),
     path('appointment/<int:pk>/', views.appointment_detail, name='appointment_detail'),
+    path('consultations/', views.consultation_list, name='consultation_list'),
+    path('consultations/create/', views.consultation_create, name='consultation_form'),
+    path('consultations/<int:pk>/', views.consultation_detail, name='consultation_detail'),
 ] 

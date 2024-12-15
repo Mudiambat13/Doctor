@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Projet</title>
-    <link rel="stylesheet" href="{% static 'css/output.min.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <link href="{% static 'css/output.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="bg-gray-50">
     <!-- Navbar -->
@@ -16,7 +19,7 @@
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{% url 'core:home' %}" class="text-xl font-bold text-indigo-600">
-                            Docteur
+                            MediConnect
                         </a>
                     </div>
                     <!-- Navigation desktop -->
@@ -132,5 +135,7 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
     </script>
+
+    <script src="{% static 'js/animations.js' %}"></script>
 </body>
 </html> 
