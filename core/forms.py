@@ -51,7 +51,7 @@ class AppointmentForm(forms.ModelForm):
     """
     class Meta:
         model = Appointment
-        fields = ['doctor', 'date', 'time']
+        fields = ['doctor', 'date', 'time', 'reason']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'})
@@ -181,9 +181,11 @@ class ConsultationForm(forms.ModelForm):
         }
 
 class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField()
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['username', 'email', 'first_name', 'last_name']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -194,3 +196,13 @@ class UserUpdateForm(forms.ModelForm):
             'last_name': 'Nom',
             'email': 'Adresse email'
         }
+
+class DoctorProfileForm(forms.ModelForm):
+    class Meta:
+        model = Doctor
+        fields = ['speciality']
+
+class PatientProfileForm(forms.ModelForm):
+    class Meta:
+        model = Patient
+        fields = ['address']

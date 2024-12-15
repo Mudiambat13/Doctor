@@ -35,14 +35,18 @@
         {% endif %}
         <form class="mt-8 space-y-6" method="post">
             {% csrf_token %}
+            {{ form.non_field_errors }}
+            
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
+                    {{ form.username.errors }}
                     <label for="id_username" class="sr-only">Nom d'utilisateur</label>
                     <input id="id_username" name="username" type="text" required 
                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                            placeholder="Nom d'utilisateur">
                 </div>
                 <div>
+                    {{ form.password.errors }}
                     <label for="id_password" class="sr-only">Mot de passe</label>
                     <input id="id_password" name="password" type="password" required 
                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 

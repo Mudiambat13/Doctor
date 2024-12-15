@@ -3,11 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import Appointment, Doctor, Patient
-from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm
+from .forms import AppointmentForm, UserRegistrationForm, PatientProfileForm, UserUpdateForm, DoctorProfileForm
 from django.contrib.auth.forms import UserChangeForm
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
 
 def home(request):
     return render(request, 'core/home.html', {
@@ -24,19 +25,67 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'core/auth/register.html', {'form': form})
 
+class CustomLoginView(LoginView):
+    template_name = 'core/auth/login.html'
+    
+    def get_success_url(self):
+        print(f"get_success_url appelé pour: {self.request.user}")
+        next_url = self.request.GET.get('next')
+        if next_url:
+            return next_url
+        
+        if hasattr(self.request.user, 'doctor'):
+            return reverse_lazy('core:doctor_dashboard')
+        elif hasattr(self.request.user, 'patient'):
+            return reverse_lazy('core:patient_dashboard')
+        else:
+            messages.warning(self.request, "Type d'utilisateur non reconnu.")
+            return reverse_lazy('core:home')
+
+@login_required
+def dashboard_redirect(request):
+    """Vue de redirection générale du tableau de bord"""
+    print(f"User: {request.user}")  # Debug
+    print(f"Is authenticated: {request.user.is_authenticated}")  # Debug
+    print(f"Has doctor: {hasattr(request.user, 'doctor')}")  # Debug
+    print(f"Has patient: {hasattr(request.user, 'patient')}")  # Debug
+
+    if not request.user.is_authenticated:
+        messages.error(request, "Veuillez vous connecter d'abord.")
+        return redirect('login')
+
+    if hasattr(request.user, 'doctor'):
+        return redirect('core:doctor_dashboard')
+    elif hasattr(request.user, 'patient'):
+        return redirect('core:patient_dashboard')
+    else:
+        messages.warning(request, "Type d'utilisateur non reconnu.")
+        return redirect('core:home')
+
 @login_required
 def doctor_dashboard(request):
-    """
-    The function `doctor_dashboard` returns a rendered HTML template for a doctor's dashboard.
+    if not hasattr(request.user, 'doctor'):
+        messages.error(request, "Accès non autorisé. Vous n'êtes pas un médecin.")
+        return redirect('core:home')
     
-    :param request: The `request` parameter in the `doctor_dashboard` function is typically an object
-    that contains information about the current HTTP request. It includes details such as the user
-    making the request, any data being sent with the request, and other metadata related to the request.
-    In this context, the function is likely
-    :return: The function `doctor_dashboard` is returning a rendered template called
-    'core/dashboard.html' in response to the `request`.
-    """
-    return render(request, 'core/dashboard.html')
+    context = {
+        'user': request.user,
+        'doctor': request.user.doctor,
+    }
+    return render(request, 'core/doctors/dashboard.html', context)
+
+@login_required
+def patient_dashboard(request):
+    if not hasattr(request.user, 'patient'):
+        messages.error(request, "Accès non autorisé. Vous n'êtes pas un patient.")
+        return redirect('core:home')
+    
+    context = {
+        'user': request.user,
+        'patient': request.user.patient,
+        # Ajoutez d'autres données nécessaires
+    }
+    return render(request, 'core/patients/dashboard.html', context)
 
 @login_required
 def appointment_list(request):
@@ -49,7 +98,7 @@ def appointment_list(request):
         'appointments': appointments,
         'title': 'Mes rendez-vous'
     }
-    return render(request, 'core/appointment_list.html', context)
+    return render(request, 'core/appointments/appointment_list.html', context)
 
 @login_required
 def appointment_create(request):
@@ -213,53 +262,30 @@ def patient_edit(request, pk):
 
 @login_required
 def profile(request):
-    """Vue pour afficher et modifier le profil de l'utilisateur"""
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        if hasattr(request.user, 'patient'):
+        if hasattr(request.user, 'doctor'):
+            profile_form = DoctorProfileForm(request.POST, instance=request.user.doctor)
+        elif hasattr(request.user, 'patient'):
             profile_form = PatientProfileForm(request.POST, instance=request.user.patient)
-        else:
-            profile_form = None
         
-        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
+        if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            if profile_form:
-                profile_form.save()
+            profile_form.save()
             messages.success(request, 'Votre profil a été mis à jour avec succès!')
             return redirect('core:profile')
     else:
         user_form = UserUpdateForm(instance=request.user)
-        if hasattr(request.user, 'patient'):
+        if hasattr(request.user, 'doctor'):
+            profile_form = DoctorProfileForm(instance=request.user.doctor)
+        elif hasattr(request.user, 'patient'):
             profile_form = PatientProfileForm(instance=request.user.patient)
-        else:
-            profile_form = None
     
     context = {
-        'title': 'Mon profil',
         'user_form': user_form,
         'profile_form': profile_form
     }
-    
-    if hasattr(request.user, 'doctor'):
-        template_name = 'core/doctor_profile.html'
-        # Ajouter des informations spécifiques au médecin
-        context.update({
-            'appointments_count': Appointment.objects.filter(doctor=request.user.doctor).count(),
-            'pending_appointments': Appointment.objects.filter(doctor=request.user.doctor, status='PENDING').count()
-        })
-    else:
-        template_name = 'core/patient_profile.html'
-        # Ajouter des informations spécifiques au patient
-        context.update({
-            'appointments_count': Appointment.objects.filter(patient=request.user.patient).count(),
-            'next_appointment': Appointment.objects.filter(
-                patient=request.user.patient,
-                date__gte=timezone.now().date(),
-                status='CONFIRMED'
-            ).first()
-        })
-    
-    return render(request, template_name, context)
+    return render(request, 'core/profile.html', context)
 
 @login_required
 def doctor_list(request):

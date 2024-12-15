@@ -38,13 +38,12 @@ class Patient(models.Model):
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     speciality = models.CharField(max_length=100)
-    license_number = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Dr. {self.user.first_name} {self.user.last_name}"
+        return f"Dr. {self.user.username}"
 
 class Consultation(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, verbose_name='Patient')

@@ -11,10 +11,14 @@ urlpatterns = [
     # Authentification et profil
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
-    path('login/', auth_views.LoginView.as_view(template_name='core/auth/login.html'), name='login'),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(
+        next_page='core:home',
+        http_method_names=['get', 'post']
+    ), name='logout'),
     
     # Tableau de bord
-    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard_redirect, name='dashboard'),
     path('doctor/dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
     path('patient/dashboard/', views.patient_dashboard, name='patient_dashboard'),
     

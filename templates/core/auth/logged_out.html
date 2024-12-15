@@ -8,9 +8,12 @@
                 <div class="card-body text-center">
                     <h2>Déconnexion réussie</h2>
                     <p>Vous avez été déconnecté avec succès.</p>
-                    <a href="{% url 'login' %}" class="btn btn-primary">
-                        Se reconnecter
-                    </a>
+                    <form method="post" action="{% url 'core:logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-600 hover:text-red-800">
+                            Déconnexion
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

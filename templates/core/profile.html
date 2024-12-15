@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- En-tête du profil -->
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-6">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+                <h2 class="text-2xl font-bold text-white">Mon Profil</h2>
+            </div>
+            
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="p-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Formulaire -->
+            <div class="p-6">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Informations générales -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-2 border-b">
+                            Informations générales
+                        </h3>
+                        {% for field in user_form %}
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">
+                                    {{ field.label }}
+                                </label>
+                                <div class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    <p class="text-red-500 text-xs italic">{{ field.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Informations spécifiques -->
+                    {% if profile_form %}
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-2 border-b">
+                                {% if user.doctor %}Informations Médecin{% else %}Informations Patient{% endif %}
+                            </h3>
+                            {% for field in profile_form %}
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        {{ field }}
+                                    </div>
+                                    {% if field.errors %}
+                                        <p class="text-red-500 text-xs italic">{{ field.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Bouton de soumission -->
+                    <div class="flex justify-end">
+                        <button type="submit" 
+                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
+                            Mettre à jour
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
