@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<!-- Inclusion de GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar avec animation -->
+    <div class="sidebar w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out">
+        <!-- Logo et titre -->
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span class="text-xl font-bold text-white">M</span>
+                </div>
+                <span class="text-xl font-bold text-gray-800">MediConnect</span>
+            </div>
+        </div>
+
+        <!-- Menu principal -->
+        <div class="p-6">
+            <nav class="space-y-4">
+                <a href="{% url 'core:patient_dashboard' %}" 
+                   class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>Tableau de bord</span>
+                </a>
+
+                <a href="{% url 'core:appointment_list' %}" 
+                   class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Rendez-vous</span>
+                </a>
+
+                <a href="{% url 'core:consultation_list' %}" 
+                   class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <span>Consultations</span>
+                </a>
+
+                <a href="{% url 'core:profile' %}" 
+                   class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span>Mon Profil</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Déconnexion -->
+        <div class="absolute bottom-0 w-full p-6 border-t border-gray-200">
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="flex items-center space-x-3 text-gray-600 hover:text-red-600 hover:bg-red-50 p-3 rounded-lg transition-all duration-200 w-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Déconnexion</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="flex-1 overflow-auto">
+        <!-- En-tête -->
+        <header class="bg-white shadow-sm p-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Tableau de bord</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">{{ user.get_full_name }}</span>
+                    <div class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 font-medium">
+                            {{ user.get_full_name|default:user.username|make_list|first|upper }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenu spécifique -->
+        <div class="p-6">
+            {% block dashboard_content %}
+            <!-- Cartes statistiques -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="stat-card bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+                    <h3 class="text-lg font-semibold text-gray-600">Prochains rendez-vous</h3>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">{{ upcoming_appointments_count|default:"0" }}</p>
+                </div>
+
+                <div class="stat-card bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+                    <h3 class="text-lg font-semibold text-gray-600">Consultations</h3>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">{{ consultations_count|default:"0" }}</p>
+                </div>
+
+                <div class="stat-card bg-white p-6 rounded-lg shadow-sm cursor-pointer">
+                    <h3 class="text-lg font-semibold text-gray-600">Messages</h3>
+                    <p class="text-3xl font-bold text-blue-600 mt-2">{{ messages_count|default:"0" }}</p>
+                </div>
+            </div>
+
+            <!-- Boutons d'action avec classe action-button -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="{% url 'core:appointment_create' %}" 
+                   class="action-button bg-white p-4 rounded-lg shadow-sm flex items-center justify-center space-x-2 text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span>Nouveau rendez-vous</span>
+                </a>
+
+                <a href="{% url 'core:consultation_create' %}" 
+                   class="action-button bg-white p-4 rounded-lg shadow-sm flex items-center justify-center space-x-2 text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Nouvelle consultation</span>
+                </a>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+<!-- Script GSAP pour les animations -->
+<script>
+    // Animation pour les cartes statistiques
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card, {
+                duration: 0.3,
+                y: -10,
+                scale: 1.02,
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                backgroundColor: '#EBF5FF',
+                ease: 'power2.out'
+            });
+        });
+
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, {
+                duration: 0.3,
+                y: 0,
+                scale: 1,
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                backgroundColor: '#FFFFFF',
+                ease: 'power2.out'
+            });
+        });
+    });
+
+    // Animation pour les boutons d'action
+    document.querySelectorAll('.action-button').forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            gsap.to(button, {
+                duration: 0.2,
+                scale: 1.03,
+                backgroundColor: '#EBF5FF',
+                color: '#2563EB',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                ease: 'power1.out'
+            });
+        });
+
+        button.addEventListener('mouseleave', () => {
+            gsap.to(button, {
+                duration: 0.2,
+                scale: 1,
+                backgroundColor: '#FFFFFF',
+                color: '#4B5563',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                ease: 'power1.out'
+            });
+        });
+    });
+
+    // Animation pour les liens du menu
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            gsap.to(link, {
+                duration: 0.2,
+                x: 5,
+                color: '#2563EB',
+                ease: 'power1.out'
+            });
+        });
+
+        link.addEventListener('mouseleave', () => {
+            gsap.to(link, {
+                duration: 0.2,
+                x: 0,
+                color: '#4B5563',
+                ease: 'power1.out'
+            });
+        });
+    });
+
+    // Animation initiale des éléments
+    gsap.from('.stat-card', {
+        duration: 0.8,
+        y: 50,
+        opacity: 0,
+        stagger: 0.2,
+        ease: 'power3.out'
+    });
+
+    gsap.from('.action-button', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.2,
+        delay: 0.4,
+        ease: 'power3.out'
+    });
+</script>
+{% endblock %}

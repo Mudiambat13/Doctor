@@ -1,141 +1,134 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediConnect</title>
+    <title>{% block title %}MediConnect{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    <link href="{% static 'css/output.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/lib.min.js" integrity="sha512-hse9qQu0UevXa+iwZLpHQsIsCSkek6hJcBPoPBYih450fd6vKOPpEq/RldThOMXlBnWI1+oSm4npbqUdiqum+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-JobWAqYk5CSjWuVV3mxgS+MmccJqkrBaDhk8SKS1BW+71dJ9gzascwzW85UwGhxiSyR7Pxhu50k+Nl3+o5I49A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50">
+<body class="flex flex-col min-h-screen bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <!-- Logo et liens principaux -->
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="{% url 'core:home' %}" class="text-xl font-bold text-indigo-600">
-                            MediConnect
-                        </a>
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-xl font-bold text-white">M</span>
                     </div>
-                    <!-- Navigation desktop -->
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{% url 'core:dashboard' %}" 
-                           class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Tableau de bord
-                        </a>
-                        <a href="{% url 'core:doctor_list' %}"
-                           class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Médecins
-                        </a>
-                        <a href="{% url 'core:appointment_list' %}"
-                           class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Rendez-vous
-                        </a>
-                    </div>
+                    <span class="font-semibold text-blue-600 text-lg">MediConnect</span>
                 </div>
-
-                <!-- Boutons de droite -->
-                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                
+                <!-- Menu de navigation -->
+                <div class="hidden md:flex items-center space-x-3">
                     {% if user.is_authenticated %}
-                        <!-- Menu profil -->
-                        <div class="ml-3 relative">
-                            <a href="{% url 'core:profile' %}" 
-                               class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                                Profil
-                            </a>
-                            <a href="{% url 'logout' %}" 
-                               class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium">
+                        <a href="{% url 'core:patient_dashboard' %}" class="py-2 px-4 text-gray-500 hover:text-blue-500 transition duration-300">Dashboard</a>
+                        <form method="post" action="{% url 'logout' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="py-2 px-4 text-gray-500 hover:text-red-500 transition duration-300">
                                 Déconnexion
-                            </a>
-                        </div>
+                            </button>
+                        </form>
                     {% else %}
-                        <a href="{% url 'login' %}" 
-                           class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                            Connexion
-                        </a>
-                        <a href="{% url 'login' %}" 
-                           class="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium">
-                            Inscription
-                        </a>
+                        <a href="{% url 'login' %}" class="py-2 px-4 text-gray-500 hover:text-blue-500 transition duration-300">Connexion</a>
+                        <a href="{% url 'register_patient' %}" class="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">Inscription</a>
                     {% endif %}
                 </div>
-
-                <!-- Bouton menu mobile -->
-                <div class="-mr-2 flex items-center sm:hidden">
-                    <button type="button" 
-                            class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" 
-                            aria-controls="mobile-menu" 
-                            aria-expanded="false">
-                        <span class="sr-only">Ouvrir le menu</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                
+                <!-- Menu mobile -->
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-button">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                         </svg>
                     </button>
                 </div>
             </div>
         </div>
-
-        <!-- Menu mobile -->
-        <div class="sm:hidden hidden" id="mobile-menu">
-            <div class="pt-2 pb-3 space-y-1">
-                <a href="{% url 'core:dashboard' %}" 
-                   class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                    Tableau de bord
-                </a>
-                <a href="{% url 'core:doctor_list' %}" 
-                   class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                    Médecins
-                </a>
-                <a href="{% url 'core:appointment_list' %}" 
-                   class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                    Rendez-vous
-                </a>
-            </div>
-            <div class="pt-4 pb-3 border-t border-gray-200">
-                {% if user.is_authenticated %}
-                    <div class="space-y-1">
-                        <a href="{% url 'core:profile' %}" 
-                           class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                            Profil
-                        </a>
-                        <a href="{% url 'logout' %}" 
-                           class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                            Déconnexion
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="space-y-1">
-                        <a href="{% url 'login' %}" 
-                           class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                            Connexion
-                        </a>
-                        <a href="{% url 'login' %}" 
-                           class="text-gray-500 hover:bg-gray-50 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">
-                            Inscription
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
+        
+        <!-- Menu mobile caché -->
+        <div class="mobile-menu hidden md:hidden">
+            <a href="{% url 'core:patient_dashboard' %}" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200">Dashboard</a>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" class="block">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-gray-200">
+                        Déconnexion
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200">Connexion</a>
+                <a href="{% url 'register_patient' %}" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200">Inscription</a>
+            {% endif %}
         </div>
     </nav>
 
     <!-- Contenu principal -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {% block content %}{% endblock %}
+    <main class="flex-1">
+        {% block content %}
+        {% endblock %}
     </main>
 
-    <!-- Script pour le menu mobile -->
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="text-center">&copy; 2024 MediConnect. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Script pour le menu mobile et les animations GSAP -->
     <script>
-        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+        // Menu mobile toggle
+        const btn = document.querySelector('.mobile-menu-button');
+        const menu = document.querySelector('.mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Animations GSAP
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animation du logo
+            gsap.from('.logo', {
+                duration: 1,
+                scale: 0,
+                opacity: 0,
+                rotation: 360,
+                ease: "back.out(1.7)"
+            });
+
+            // Animation de la navigation
+            gsap.from('nav a', {
+                duration: 0.5,
+                opacity: 0,
+                y: -50,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+
+            // Animation du contenu principal
+            gsap.from('main', {
+                duration: 1,
+                opacity: 0,
+                y: 50,
+                ease: "power3.out"
+            });
+
+            // Animation du footer
+            gsap.from('footer', {
+                duration: 1,
+                opacity: 0,
+                y: 50,
+                ease: "power3.out",
+                delay: 0.5
+            });
         });
     </script>
-
-    <script src="{% static 'js/animations.js' %}"></script>
 </body>
-</html> 
+</html>
