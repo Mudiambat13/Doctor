@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🏥 MediConnect
 
 [![Repo](https://img.shields.io/badge/GitHub-Doctor%20Connect-blue?style=flat-square&logo=github)](https://github.com/Mudiambat13/Doctor)
@@ -155,5 +155,4 @@ django-allauth==0.60.0
 dj-rest-auth==5.0.2  
 djangorestframework-simplejwt==5.3.1  
 requests==2.31.0  
-cryptography==42.0.2
->>>>>>> db567225bdf18981db777fb7bb12b725c60ba03f
+cryptography==42.0.1
