@@ -101,45 +101,20 @@ class ConsultationForm(forms.ModelForm):
     """Formulaire de consultation (réservé aux médecins)"""
     class Meta:
         model = Consultation
-        fields = ['patient', 'doctor', 'date', 'diagnosis', 'traitement', 'notes', 'prescription']
+        fields = ['patient', 'date', 'symptoms', 'diagnosis', 'prescription', 'notes_medicales', 'recommandations']
         widgets = {
-            'patient': forms.Select(
-                attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}
-            ),
-            'doctor': forms.Select(
-                attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}
-            ),
-            'date': forms.DateInput(
-                attrs={
-                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-                    'type': 'date'
-                }
-            ),
-            'diagnosis': forms.Textarea(
-                attrs={
-                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-                    'rows': 4
-                }
-            ),
-            'traitement': forms.Textarea(
-                attrs={
-                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-                    'rows': 4
-                }
-            ),
-            'notes': forms.Textarea(
-                attrs={
-                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-                    'rows': 4
-                }
-            ),
-            'prescription': forms.Textarea(
-                attrs={
-                    'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
-                    'rows': 4
-                }
-            )
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'diagnosis': forms.Textarea(attrs={'rows': 4}),
+            'prescription': forms.Textarea(attrs={'rows': 4}),
+            'notes_medicales': forms.Textarea(attrs={'rows': 4}),
+            'recommandations': forms.Textarea(attrs={'rows': 4}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Rendre certains champs obligatoires uniquement pour les médecins
+        self.fields['diagnosis'].required = True
+        self.fields['prescription'].required = True
 
 class UserUpdateForm(forms.ModelForm):
     """Formulaire de mise à jour des informations utilisateur"""

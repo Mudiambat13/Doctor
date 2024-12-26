@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Patient, Doctor, Appointment, Consultation
-from .forms import AppointmentForm, ConsultationForm, PatientProfileForm, UserUpdateForm
+from .forms import AppointmentForm, ConsultationForm, PatientProfileForm, UserUpdateForm, PatientRegistrationForm
+from django.contrib.auth import login
+from django.utils import timezone
 
 @login_required
 def dashboard(request):
@@ -17,8 +19,19 @@ def patient_dashboard(request):
     if not hasattr(request.user, 'patient'):
         return redirect('core:profile')
     
+    consultations = Consultation.objects.filter(
+        patient=request.user.patient
+    ).order_by('-date')
+    
+    appointments = Appointment.objects.filter(
+        patient=request.user.patient,
+        date__gte=timezone.now()
+    ).order_by('date')
+    
     context = {
         'patient': request.user.patient,
+        'consultations': consultations,
+        'appointments': appointments,
         'title': 'Tableau de bord Patient'
     }
     return render(request, 'core/patient/dashboard.html', context)
@@ -63,7 +76,7 @@ def consultation_create(request):
     else:
         form = ConsultationForm()
     
-    return render(request, 'core/consultations/create.html', {'form': form})
+    return render(request, 'core/consultations/consultation_form.html', {'form': form})
 
 @login_required
 def profile(request):

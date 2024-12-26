@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'core'
+    'core',
+    'jazzmin'
 ]
 
 MIDDLEWARE = [
@@ -178,4 +179,17 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
     messages.ERROR: 'error',
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "MediConnect Admin",
+    "site_header": "MediConnect",
+    "site_brand": "MediConnect",
+    "welcome_sign": "Bienvenue dans l'interface d'administration",
+    "copyright": "MediConnect",
+    "search_model": ["auth.User", "core.Patient", "core.Doctor"],
+    "topmenu_links": [
+        {"name": "Accueil", "url": "admin:index"},
+        {"model": "auth.User"},
+    ],
 }
